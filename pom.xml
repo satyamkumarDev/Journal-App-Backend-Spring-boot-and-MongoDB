@@ -22,8 +22,8 @@
 
 	<properties>
 		<java.version>21</java.version>
+		<sonar.organization>satyamkumardev</sonar.organization>
 	</properties>
-
 	<dependencies>
 		<!-- ✅ Correct dependency -->
 		<dependency>
