@@ -4,6 +4,7 @@ import net.engineeringdigest.journalApp.entity.JournalEntry;
 import net.engineeringdigest.journalApp.entity.User;
 import net.engineeringdigest.journalApp.repository.JournalEntryRepository;
 import org.bson.types.ObjectId;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 
 @Service
@@ -41,10 +43,17 @@ public class JournalEntryService {
         return journalEntryRepository.findById(journalId);
     }
 
+    @Transactional
     public void deleteById(ObjectId journalId, String username){
-        User user = userService.findByUserName(username);
-        user.getJournEntryList().removeIf(x->x.getId().equals(journalId));
-        userService.saveEntry(user);
-        journalEntryRepository.deleteById(journalId);
+        try {
+            User user = userService.findByUserName(username);
+            boolean removed = user.getJournEntryList().removeIf(x->x.getId().equals(journalId));
+            if(removed){
+                userService.saveEntry(user);
+                journalEntryRepository.deleteById(journalId);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
